@@ -89,6 +89,51 @@ namespace Wed_Project.Migrations
                     b.ToTable("AISystemLogs");
                 });
 
+            modelBuilder.Entity("Wed_Project.Models.AdminAuditLog", b =>
+                {
+                    b.Property<int>("AuditId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("AuditId"));
+
+                    b.Property<string>("ActionType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<int>("AdminUserId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DetailJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("TargetId")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.HasKey("AuditId");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.ToTable("AdminAuditLogs");
+                });
+
             modelBuilder.Entity("Wed_Project.Models.Content", b =>
                 {
                     b.Property<int>("ContentId")
@@ -112,6 +157,14 @@ namespace Wed_Project.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("FetchError")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("FetchStatus")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -127,14 +180,175 @@ namespace Wed_Project.Migrations
                     b.Property<bool>("IsGuest")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SourceType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<string>("SourceUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("ContentId");
 
+                    b.HasIndex("SourceType");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Contents");
+                    b.ToTable("Contents", t =>
+                        {
+                            t.HasCheckConstraint("CK_Contents_SourceType", "[SourceType] IN (N'FileUpload', N'TextUrl', N'VideoUrl', N'DocumentUrl')");
+
+                            t.HasCheckConstraint("CK_Contents_UrlFieldsBySource", "(([SourceType] = N'FileUpload' AND [SourceUrl] IS NULL AND [FetchStatus] IS NULL AND [FetchError] IS NULL) OR ([SourceType] <> N'FileUpload' AND [SourceUrl] IS NOT NULL AND [FetchStatus] IS NOT NULL))");
+                        });
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.ContentModeration", b =>
+                {
+                    b.Property<int>("ModerationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ModerationId"));
+
+                    b.Property<int>("ContentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ReviewedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("ReviewedByUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("ModerationId");
+
+                    b.HasIndex("ContentId")
+                        .IsUnique();
+
+                    b.HasIndex("ReviewedByUserId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("ContentModerations");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.DailyUsageCounter", b =>
+                {
+                    b.Property<int>("CounterId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CounterId"));
+
+                    b.Property<int>("AIProcessCount")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GuestSessionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("QuizGenerationCount")
+                        .HasColumnType("int");
+
+                    b.Property<double>("TotalProcessingTime")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UploadCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UsageDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CounterId");
+
+                    b.HasIndex("GuestSessionId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UsageDate", "GuestSessionId")
+                        .IsUnique()
+                        .HasFilter("[GuestSessionId] IS NOT NULL");
+
+                    b.HasIndex("UsageDate", "UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
+                    b.ToTable("DailyUsageCounters", t =>
+                        {
+                            t.HasCheckConstraint("CK_DailyUsageCounters_Actor", "(([UserId] IS NOT NULL AND [GuestSessionId] IS NULL) OR ([UserId] IS NULL AND [GuestSessionId] IS NOT NULL))");
+                        });
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.GuestSession", b =>
+                {
+                    b.Property<int>("GuestSessionId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GuestSessionId"));
+
+                    b.Property<string>("FingerprintHash")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("FirstSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("GuestToken")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<bool>("IsBlocked")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("TrialUsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.HasKey("GuestSessionId");
+
+                    b.HasIndex("GuestToken")
+                        .IsUnique();
+
+                    b.ToTable("GuestSessions");
                 });
 
             modelBuilder.Entity("Wed_Project.Models.Question", b =>
@@ -304,6 +518,47 @@ namespace Wed_Project.Migrations
                     b.ToTable("StudyStatistics");
                 });
 
+            modelBuilder.Entity("Wed_Project.Models.SystemSetting", b =>
+                {
+                    b.Property<int>("SettingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SettingId"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
+
+                    b.Property<string>("SettingKey")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UpdatedByUserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("SettingId");
+
+                    b.HasIndex("SettingKey")
+                        .IsUnique();
+
+                    b.HasIndex("UpdatedByUserId");
+
+                    b.ToTable("SystemSettings");
+                });
+
             modelBuilder.Entity("Wed_Project.Models.User", b =>
                 {
                     b.Property<int>("UserId")
@@ -379,7 +634,7 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.Content", "Content")
                         .WithOne("AIProcess")
                         .HasForeignKey("Wed_Project.Models.AIProcess", "ContentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Content");
@@ -390,9 +645,20 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.AdminAuditLog", b =>
+                {
+                    b.HasOne("Wed_Project.Models.User", "AdminUser")
+                        .WithMany("AdminAuditLogs")
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
                 });
 
             modelBuilder.Entity("Wed_Project.Models.Content", b =>
@@ -400,7 +666,42 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.User", "User")
                         .WithMany("Contents")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.ContentModeration", b =>
+                {
+                    b.HasOne("Wed_Project.Models.Content", "Content")
+                        .WithOne("ContentModeration")
+                        .HasForeignKey("Wed_Project.Models.ContentModeration", "ContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wed_Project.Models.User", "ReviewedBy")
+                        .WithMany("ReviewedContentModerations")
+                        .HasForeignKey("ReviewedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Content");
+
+                    b.Navigation("ReviewedBy");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.DailyUsageCounter", b =>
+                {
+                    b.HasOne("Wed_Project.Models.GuestSession", "GuestSession")
+                        .WithMany("DailyUsageCounters")
+                        .HasForeignKey("GuestSessionId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("Wed_Project.Models.User", "User")
+                        .WithMany("DailyUsageCounters")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("GuestSession");
 
                     b.Navigation("User");
                 });
@@ -410,7 +711,7 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.Quiz", "Quiz")
                         .WithMany("Questions")
                         .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Quiz");
@@ -421,13 +722,13 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.Content", "Content")
                         .WithMany("Quizzes")
                         .HasForeignKey("ContentId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Wed_Project.Models.User", "User")
                         .WithMany("Quizzes")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Content");
 
@@ -439,13 +740,13 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.Quiz", "Quiz")
                         .WithMany("QuizAttempts")
                         .HasForeignKey("QuizId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Wed_Project.Models.User", "User")
                         .WithMany("QuizAttempts")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction);
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Quiz");
 
@@ -457,10 +758,20 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.User", "User")
                         .WithOne("StudyStatistic")
                         .HasForeignKey("Wed_Project.Models.StudyStatistic", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.SystemSetting", b =>
+                {
+                    b.HasOne("Wed_Project.Models.User", "UpdatedBy")
+                        .WithMany("UpdatedSystemSettings")
+                        .HasForeignKey("UpdatedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("UpdatedBy");
                 });
 
             modelBuilder.Entity("Wed_Project.Models.User", b =>
@@ -479,7 +790,7 @@ namespace Wed_Project.Migrations
                     b.HasOne("Wed_Project.Models.QuizAttempt", "QuizAttempt")
                         .WithMany("UserAnswers")
                         .HasForeignKey("AttemptId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Wed_Project.Models.Question", "Question")
@@ -497,7 +808,14 @@ namespace Wed_Project.Migrations
                 {
                     b.Navigation("AIProcess");
 
+                    b.Navigation("ContentModeration");
+
                     b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.GuestSession", b =>
+                {
+                    b.Navigation("DailyUsageCounters");
                 });
 
             modelBuilder.Entity("Wed_Project.Models.Question", b =>
@@ -524,13 +842,21 @@ namespace Wed_Project.Migrations
 
             modelBuilder.Entity("Wed_Project.Models.User", b =>
                 {
+                    b.Navigation("AdminAuditLogs");
+
                     b.Navigation("Contents");
+
+                    b.Navigation("DailyUsageCounters");
 
                     b.Navigation("QuizAttempts");
 
                     b.Navigation("Quizzes");
 
+                    b.Navigation("ReviewedContentModerations");
+
                     b.Navigation("StudyStatistic");
+
+                    b.Navigation("UpdatedSystemSettings");
                 });
 #pragma warning restore 612, 618
         }

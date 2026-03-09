@@ -34,5 +34,13 @@ namespace Wed_Project.Models
         public ICollection<QuizAttempt> QuizAttempts { get; set; } = new List<QuizAttempt>();
 
         public StudyStatistic? StudyStatistic { get; set; }
+
+        public ICollection<DailyUsageCounter> DailyUsageCounters { get; set; } = new List<DailyUsageCounter>();
+
+        public ICollection<ContentModeration> ReviewedContentModerations { get; set; } = new List<ContentModeration>();
+
+        public ICollection<AdminAuditLog> AdminAuditLogs { get; set; } = new List<AdminAuditLog>();
+
+        public ICollection<SystemSetting> UpdatedSystemSettings { get; set; } = new List<SystemSetting>();
     }
 }

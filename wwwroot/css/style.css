@@ -1,0 +1,259 @@
+:root {
+  --bg: #0b1220;
+  --card: rgba(255, 255, 255, 0.06);
+  --card2: rgba(255, 255, 255, 0.08);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: rgba(255, 255, 255, 0.86);
+  --muted: rgba(255, 255, 255, 0.62);
+  --shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+  --radius: 18px;
+}
+
+html,
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* phần nội dung chính */
+main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+body {
+  background:
+    radial-gradient(
+      900px 600px at 10% 10%,
+      rgba(13, 110, 253, 0.22),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 600px at 90% 10%,
+      rgba(25, 135, 84, 0.18),
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 700px at 40% 90%,
+      rgba(220, 53, 69, 0.14),
+      transparent 60%
+    ),
+    var(--bg);
+  color: var(--text);
+}
+
+a {
+  text-decoration: none;
+}
+.text-muted-2 {
+  color: var(--muted) !important;
+}
+
+.navbar-glass {
+  background: rgba(10, 14, 26, 0.55);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+}
+
+.glass {
+  background: rgba(30, 41, 59, 0.95);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 30px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.glass-2 {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.btn-soft {
+  background: rgba(13, 110, 253, 0.18);
+  border: 1px solid rgba(13, 110, 253, 0.35);
+  color: #dbe7ff;
+}
+.btn-soft:hover {
+  background: rgba(13, 110, 253, 0.28);
+  border-color: rgba(13, 110, 253, 0.55);
+  color: #fff;
+}
+
+.badge-soft {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.kpi {
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.form-control,
+.form-select {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba(13, 110, 253, 0.55) !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.18) !important;
+}
+
+.table {
+  color: rgba(255, 255, 255, 0.86);
+}
+.table thead th {
+  color: rgba(255, 255, 255, 0.62);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+.table td,
+.table th {
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.progress {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar {
+  position: sticky;
+  top: 88px;
+}
+.sidebar a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.78);
+}
+.sidebar a:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+.sidebar a.active {
+  background: rgba(13, 110, 253, 0.18);
+  border: 1px solid rgba(13, 110, 253, 0.35);
+  color: #fff;
+}
+
+.upload-drop {
+  border: 1px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 18px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.04);
+}
+.upload-drop:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.small-note {
+  font-size: 0.92rem;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.auth-page {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* card login giống register */
+.glass {
+  background: rgba(30, 41, 59, 0.95);
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+}
+
+/* tiêu đề */
+.glass h3 {
+  font-weight: 600;
+  color: white;
+}
+
+/* chữ mô tả */
+.text-muted-2 {
+  color: #9ca3af;
+}
+
+/* input */
+.glass .form-control {
+  background: #111827;
+  border: 1px solid #374151;
+  color: white;
+}
+
+/* focus input */
+.glass .form-control:focus {
+  border-color: #3b82f6;
+  box-shadow: none;
+}
+
+/* checkbox */
+.form-check-label {
+  color: #9ca3af;
+}
+
+/* link */
+.glass a {
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.glass a:hover {
+  text-decoration: underline;
+}
+
+/* button login */
+.glass .btn-primary {
+  background: #2563eb;
+  border: none;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.glass .btn-primary:hover {
+  background: #1d4ed8;
+}
+
+/*footer*/
+.footer {
+  margin-top: auto;
+  padding: 25px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(6px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}

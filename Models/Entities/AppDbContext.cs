@@ -21,6 +21,7 @@ namespace Wed_Project.Models
         public DbSet<ContentModeration> ContentModerations { get; set; }
         public DbSet<AdminAuditLog> AdminAuditLogs { get; set; }
         public DbSet<SystemSetting> SystemSettings { get; set; }
+        public DbSet<EmailVerificationOtp> EmailVerificationOtps { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -35,6 +36,30 @@ namespace Wed_Project.Models
             modelBuilder.Entity<GuestSession>()
                 .HasIndex(x => x.GuestToken)
                 .IsUnique();
+
+            modelBuilder.Entity<Role>()
+                .HasIndex(x => x.RoleName)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.Username)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(x => x.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<EmailVerificationOtp>()
+                .HasIndex(x => new { x.Email, x.Purpose, x.IsUsed, x.ExpiresAt });
+
+            modelBuilder.Entity<EmailVerificationOtp>()
+                .HasIndex(x => x.UserId);
+
+            modelBuilder.Entity<EmailVerificationOtp>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<DailyUsageCounter>()
                 .HasIndex(x => new { x.UsageDate, x.UserId })

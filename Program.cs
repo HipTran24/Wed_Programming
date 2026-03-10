@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Wed_Project.Models;
+using Wed_Project.Services.Auth;
+using Wed_Project.Services.Email;
+using Wed_Project.Services.Otp;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +11,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddHttpClient();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
+builder.Services.Configure<EmailOtpSettings>(builder.Configuration.GetSection("EmailOtp"));
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+builder.Services.AddScoped<IEmailOtpService, EmailOtpService>();
 
 var app = builder.Build();
 
@@ -23,6 +31,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.MapControllers();
 
 app.MapStaticAssets();
 

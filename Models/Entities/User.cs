@@ -10,17 +10,25 @@ namespace Wed_Project.Models
         public int UserId { get; set; }
 
         [Required]
+        [MaxLength(64)]
         public string Username { get; set; } = string.Empty;
 
+        [MaxLength(128)]
         public string FullName { get; set; } = string.Empty;
 
+        [Required]
+        [MaxLength(256)]
         public string Email { get; set; } = string.Empty;
 
+        [Required]
+        [MaxLength(512)]
         public string PasswordHash { get; set; } = string.Empty;
 
         public int RoleId { get; set; }
 
         public bool IsLocked { get; set; }
+
+        public bool IsEmailVerified { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

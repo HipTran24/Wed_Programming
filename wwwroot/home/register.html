@@ -30,35 +30,82 @@
               học tập.
             </p>
 
-            <div class="row g-3">
+            <form id="registerForm" class="row g-3" novalidate>
               <div class="col-12">
-                <label class="form-label">Họ tên</label>
-                <input class="form-control" placeholder="Nguyễn Văn A" />
-              </div>
-              <div class="col-12">
-                <label class="form-label">Email</label>
+                <label class="form-label" for="username">Tên đăng nhập</label>
                 <input
+                  id="username"
+                  name="username"
+                  class="form-control"
+                  placeholder="nguyenvana"
+                  maxlength="64"
+                  autocomplete="username"
+                  required
+                />
+                <div class="invalid-feedback" id="usernameError"></div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label" for="fullName">Họ tên</label>
+                <input
+                  id="fullName"
+                  name="fullName"
+                  class="form-control"
+                  placeholder="Nguyễn Văn A"
+                  maxlength="128"
+                  autocomplete="name"
+                  required
+                />
+                <div class="invalid-feedback" id="fullNameError"></div>
+              </div>
+
+              <div class="col-12">
+                <label class="form-label" for="email">Email</label>
+                <input
+                  id="email"
+                  name="email"
                   class="form-control"
                   placeholder="name@email.com"
                   type="email"
+                  maxlength="256"
+                  autocomplete="email"
+                  required
                 />
+                <div class="invalid-feedback" id="emailError"></div>
               </div>
+
               <div class="col-12">
-                <label class="form-label">Mật khẩu</label>
+                <label class="form-label" for="password">Mật khẩu</label>
                 <input
+                  id="password"
+                  name="password"
                   class="form-control"
                   type="password"
                   placeholder="••••••••"
+                  minlength="8"
+                  maxlength="128"
+                  autocomplete="new-password"
+                  required
                 />
+                <div class="invalid-feedback" id="passwordError"></div>
               </div>
+
               <div class="col-12">
-                <label class="form-label">Nhập lại mật khẩu</label>
+                <label class="form-label" for="confirmPassword">Nhập lại mật khẩu</label>
                 <input
+                  id="confirmPassword"
+                  name="confirmPassword"
                   class="form-control"
                   type="password"
                   placeholder="••••••••"
+                  minlength="8"
+                  maxlength="128"
+                  autocomplete="new-password"
+                  required
                 />
+                <div class="invalid-feedback" id="confirmPasswordError"></div>
               </div>
+
               <div class="col-12">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="agree" />
@@ -66,15 +113,20 @@
                     Tôi đồng ý với điều khoản sử dụng
                   </label>
                 </div>
+                <div class="invalid-feedback d-block" id="acceptTermsError"></div>
               </div>
+
               <div class="col-12">
-                <button class="btn btn-primary w-100">Tạo tài khoản</button>
+                <div id="registerMessage" class="small mb-3"></div>
+                <button id="registerButton" type="submit" class="btn btn-primary w-100">
+                  Tạo tài khoản
+                </button>
                 <div class="text-muted-2 small mt-3">
                   Đã có tài khoản?
                   <a href="login.html" class="text-white">Đăng nhập</a>
                 </div>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </div>
@@ -83,5 +135,6 @@
     <footer class="footer">© 2026 AI Study</footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/register.js"></script>
   </body>
 </html>

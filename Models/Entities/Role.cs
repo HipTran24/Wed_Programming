@@ -9,6 +9,7 @@ namespace Wed_Project.Models
         public int RoleId { get; set; }
 
         [Required]
+        [MaxLength(64)]
         public string RoleName { get; set; } = string.Empty;
 
         public ICollection<User> Users { get; set; } = new List<User>();

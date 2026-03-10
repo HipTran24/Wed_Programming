@@ -303,6 +303,66 @@ namespace Wed_Project.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Wed_Project.Models.EmailVerificationOtp", b =>
+                {
+                    b.Property<int>("OtpId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("OtpId"));
+
+                    b.Property<int>("AttemptCount")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OtpHash")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("OtpSalt")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("Purpose")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("RequestedIp")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UsedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("OtpId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("Email", "Purpose", "IsUsed", "ExpiresAt");
+
+                    b.ToTable("EmailVerificationOtps");
+                });
+
             modelBuilder.Entity("Wed_Project.Models.GuestSession", b =>
                 {
                     b.Property<int>("GuestSessionId")
@@ -479,9 +539,13 @@ namespace Wed_Project.Migrations
 
                     b.Property<string>("RoleName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("RoleId");
+
+                    b.HasIndex("RoleName")
+                        .IsUnique();
 
                     b.ToTable("Roles");
                 });
@@ -572,29 +636,42 @@ namespace Wed_Project.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<bool>("IsEmailVerified")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsLocked")
                         .HasColumnType("bit");
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
 
                     b.HasKey("UserId");
 
+                    b.HasIndex("Email")
+                        .IsUnique();
+
                     b.HasIndex("RoleId");
+
+                    b.HasIndex("Username")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -702,6 +779,16 @@ namespace Wed_Project.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("GuestSession");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Wed_Project.Models.EmailVerificationOtp", b =>
+                {
+                    b.HasOne("Wed_Project.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("User");
                 });

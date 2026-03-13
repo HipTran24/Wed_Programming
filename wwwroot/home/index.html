@@ -905,8 +905,17 @@
           <li><a href="pricing.html">Gói sử dụng</a></li>
         </ul>
         <div class="nav-actions">
-          <a class="btn btn-ghost" href="login.html">Đăng nhập</a>
-          <a class="btn btn-lime" href="register.html">Đăng ký miễn phí</a>
+          <div data-auth-guest style="display: inline-flex; gap: 12px">
+            <a class="btn btn-ghost" href="login.html">Đăng nhập</a>
+            <a class="btn btn-lime" href="register.html">Đăng ký miễn phí</a>
+          </div>
+          <div data-auth-user style="display: none; gap: 12px; align-items: center">
+            <span class="btn btn-ghost" style="cursor: default; pointer-events: none">
+              Xin chào, <span data-auth-name>User</span>
+            </span>
+            <a class="btn btn-lime" href="dashboard.html">Vào dashboard</a>
+            <a class="btn btn-ghost" href="login.html" data-auth-logout>Đăng xuất</a>
+          </div>
         </div>
       </div>
     </nav>
@@ -1261,7 +1270,24 @@
       </div>
     </footer>
 
+    <script src="../js/auth.js"></script>
     <script>
+      (function () {
+        if (!window.AuthClient || !window.AuthClient.isAuthenticated()) {
+          return;
+        }
+
+        const guest = document.querySelector("[data-auth-guest]");
+        const user = document.querySelector("[data-auth-user]");
+        if (guest) guest.style.display = "none";
+        if (user) user.style.display = "inline-flex";
+
+        const current = window.AuthClient.getCurrentUser();
+        if (current) {
+          window.AuthClient.bindUserUi(current);
+        }
+      })();
+
       const navbar = document.getElementById("navbar");
       window.addEventListener("scroll", () => {
         navbar.classList.toggle("scrolled", window.scrollY > 40);

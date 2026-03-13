@@ -1,4 +1,4 @@
-:root {
+﻿:root {
   --bg: #0b1220;
   --card: rgba(255, 255, 255, 0.06);
   --card2: rgba(255, 255, 255, 0.08);
@@ -16,7 +16,7 @@ body {
   flex-direction: column;
 }
 
-/* phần nội dung chính */
+/* pháº§n ná»™i dung chÃ­nh */
 main {
   flex: 1;
   display: flex;
@@ -103,6 +103,20 @@ a {
   border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: rgba(255, 255, 255, 0.86) !important;
 }
+
+/* Keep browser-native password reveal button (if supported). */
+input[type="password"] {
+  padding-right: 2.75rem;
+}
+
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: block;
+}
+
+input[type="password"]::-ms-reveal {
+  filter: invert(100%);
+}
 .form-control::placeholder {
   color: rgba(255, 255, 255, 0.45);
 }
@@ -175,7 +189,7 @@ a {
   justify-content: center;
 }
 
-/* card login giống register */
+/* card login giá»‘ng register */
 .glass {
   background: rgba(30, 41, 59, 0.95);
   border-radius: 16px;
@@ -184,13 +198,13 @@ a {
   backdrop-filter: blur(8px);
 }
 
-/* tiêu đề */
+/* tiÃªu Ä‘á» */
 .glass h3 {
   font-weight: 600;
   color: white;
 }
 
-/* chữ mô tả */
+/* chá»¯ mÃ´ táº£ */
 .text-muted-2 {
   color: #9ca3af;
 }
@@ -257,3 +271,4 @@ body {
   display: flex;
   flex-direction: column;
 }
+

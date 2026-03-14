@@ -6,17 +6,22 @@
 
   const tokenStorageKey = "auth.accessToken";
   const userStorageKey = "auth.currentUser";
-  const messageElement = document.getElementById("loginMessage");
+  const identifierInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
+  const rememberMeInput = document.getElementById("rememberMe");
   const loginButton = document.getElementById("loginButton");
+  const alertBox = document.getElementById("alertBox");
+  const alertMsg = document.getElementById("alertMsg");
   let returnUrl = "index.html";
+  let isSubmitting = false;
 
   const setMessage = (message, isSuccess) => {
-    if (!messageElement) {
+    if (!alertBox || !alertMsg) {
       return;
     }
 
-    messageElement.textContent = message || "";
-    messageElement.className = `small mb-3 ${isSuccess ? "text-success" : "text-warning"}`;
+    alertMsg.textContent = message || "";
+    alertBox.className = `alert ${isSuccess ? "alert-success" : "alert-danger"}${message ? " d-block" : " d-none"}`;
   };
 
   const setFieldError = (fieldId, message) => {
@@ -32,40 +37,46 @@
     }
   };
 
-  const clearErrors = () => {
-    ["emailOrUsername", "password"].forEach((fieldId) => {
-      const input = document.getElementById(fieldId);
-      const error = document.getElementById(`${fieldId}Error`);
+  const clearFieldError = (fieldId) => {
+    const input = document.getElementById(fieldId);
+    const error = document.getElementById(`${fieldId}Error`);
 
-      if (input) {
-        input.classList.remove("is-invalid");
-      }
+    if (input) {
+      input.classList.remove("is-invalid");
+    }
 
-      if (error) {
-        error.textContent = "";
-      }
-    });
+    if (error) {
+      error.textContent = "";
+    }
   };
 
-  const setSubmitting = (isSubmitting) => {
+  const clearErrors = () => {
+    ["email", "password"].forEach(clearFieldError);
+  };
+
+  const setSubmitting = (submitting) => {
     if (!loginButton) {
       return;
     }
 
-    loginButton.disabled = isSubmitting;
-    loginButton.textContent = isSubmitting ? "Đang đăng nhập..." : "Đăng nhập";
+    loginButton.disabled = submitting;
+    loginButton.textContent = submitting ? "Đang đăng nhập..." : "Đăng nhập";
   };
 
   const setupPasswordToggle = () => {
-    const toggle = document.getElementById("toggleLoginPassword");
-    const passwordInput = document.getElementById("password");
+    const toggleButton = document.getElementById("togglePwd");
+    const eyeIcon = document.getElementById("eyeIcon");
 
-    if (!toggle || !passwordInput) {
+    if (!toggleButton || !passwordInput || !eyeIcon) {
       return;
     }
 
-    toggle.addEventListener("change", () => {
-      passwordInput.type = toggle.checked ? "text" : "password";
+    toggleButton.addEventListener("click", () => {
+      const show = passwordInput.type === "password";
+      passwordInput.type = show ? "text" : "password";
+      eyeIcon.innerHTML = show
+        ? '<path stroke="currentColor" stroke-width="2" d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/>'
+        : '<path stroke="currentColor" stroke-width="2" d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>';
     });
   };
 
@@ -88,18 +99,18 @@
     const verified = query.get("verified");
     const notice = (query.get("message") || "").trim();
     const requestedReturn = (query.get("returnUrl") || "").trim();
-    const input = document.getElementById("emailOrUsername");
 
     if (requestedReturn) {
       returnUrl = requestedReturn;
     }
 
-    if (input && email) {
-      input.value = email;
+    if (identifierInput && email) {
+      identifierInput.value = email;
     }
 
     if (verified === "1") {
       setMessage("Email đã được xác thực. Bạn có thể đăng nhập ngay.", true);
+      return;
     }
 
     if (notice) {
@@ -119,17 +130,20 @@
     window.location.href = returnUrl || "index.html";
   };
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  const handleLogin = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
     clearErrors();
     setMessage("", false);
 
-    const emailOrUsername = (document.getElementById("emailOrUsername")?.value || "").trim();
-    const password = document.getElementById("password")?.value || "";
-    const rememberMe = document.getElementById("rememberMe")?.checked || false;
+    const emailOrUsername = (identifierInput?.value || "").trim();
+    const password = passwordInput?.value || "";
+    const rememberMe = !!rememberMeInput?.checked;
 
     if (!emailOrUsername) {
-      setFieldError("emailOrUsername", "Vui lòng nhập email hoặc tên đăng nhập.");
+      setFieldError("email", "Vui lòng nhập email hoặc tên đăng nhập.");
       return;
     }
 
@@ -138,6 +152,7 @@
       return;
     }
 
+    isSubmitting = true;
     setSubmitting(true);
 
     try {
@@ -157,15 +172,17 @@
       if (!response.ok) {
         if (data?.errors && typeof data.errors === "object") {
           Object.entries(data.errors).forEach(([field, messages]) => {
-            const fieldName = String(field || "").toLowerCase();
-            if (fieldName.includes("emailorusername")) {
-              setFieldError("emailOrUsername", Array.isArray(messages) ? String(messages[0]) : String(messages));
-            }
+            const key = String(field || "").toLowerCase();
+            const firstMessage = Array.isArray(messages) ? String(messages[0] || "") : String(messages || "");
 
-            if (fieldName.includes("password")) {
-              setFieldError("password", Array.isArray(messages) ? String(messages[0]) : String(messages));
+            if (key.includes("emailorusername") || key.includes("email") || key.includes("username")) {
+              setFieldError("email", firstMessage || "Thông tin đăng nhập chưa hợp lệ.");
+            }
+            if (key.includes("password")) {
+              setFieldError("password", firstMessage || "Thông tin đăng nhập chưa hợp lệ.");
             }
           });
+
           setMessage(data.title || "Thông tin đăng nhập chưa hợp lệ.", false);
           return;
         }
@@ -181,6 +198,10 @@
       }
 
       const storage = rememberMe ? window.localStorage : window.sessionStorage;
+      const otherStorage = rememberMe ? window.sessionStorage : window.localStorage;
+      otherStorage.removeItem(tokenStorageKey);
+      otherStorage.removeItem(userStorageKey);
+
       storage.setItem(tokenStorageKey, token);
       storage.setItem(
         userStorageKey,
@@ -203,9 +224,23 @@
       console.error("login_failed", error);
       setMessage("Không thể kết nối tới máy chủ.", false);
     } finally {
+      isSubmitting = false;
       setSubmitting(false);
     }
+  };
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    await handleLogin();
   });
+
+  if (identifierInput) {
+    identifierInput.addEventListener("input", () => clearFieldError("email"));
+  }
+
+  if (passwordInput) {
+    passwordInput.addEventListener("input", () => clearFieldError("password"));
+  }
 
   prefillFromQuery();
   redirectIfAlreadyLoggedIn();
